@@ -10,25 +10,31 @@ class Search extends Component {
     booklist: []
   }
 
+
   handleSubmit = (book, e) => {
-    console.log("currentlyReading.js"+ book)
     let targetShelf = e.target.value
     let targetBook = book
     this.props.updateShelf(targetBook, targetShelf)
   }
 
   updateQuery = (query) => {
-    this.setState({query: query.trim()})
-    BooksAPI.search(query).then((searchResults) => {
-      this.setState({booklist: searchResults})
-      console.log("query ", query)
-    }).catch( error => {
-      console.log("Caught ", error )
-    })
-  }
+    this.setState({query: query})
+      BooksAPI.search(query).then((searchResults) => {
+        console.log("query ", query)
+        console.log("search results ", searchResults)
+
+        if (searchResults.error) {
+          this.setState({booklist: []})
+        } else {
+          this.setState({booklist: searchResults})
+        }
+
+      }).catch(error => {
+        console.log("Search Error", error )
+      })
+}
 
   render() {
-    const queryX = this.state.query
     return (
       <div className="search-books">
         <div>
@@ -47,34 +53,34 @@ class Search extends Component {
             </div>
           </div>
         <div className="search-books-results">
-          {this.state.query !== 0 && (
+          {this.state.query !== "" && (
           <ol className="books-grid">
-                {this.state.booklist.map((book) => (
-                  <li key={book.id}>
-                    <div className="book">
-                      <div className="book-top">
-                        <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
-                        <div className="book-shelf-changer">
-                          <select value={this.state.shelf} onChange={(e) => this.handleSubmit(book, e)}>
-                            <option value="none" disabled>Move to...</option>
-                            <option value="currentlyReading">Currently Reading</option>
-                            <option value="wantToRead">Want to Read</option>
-                            <option value="read">Read</option>
-                            <option value="none">None</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="book-title">{book.title}</div>
-                      <div className="book-sub-title">{book.subtitle}</div>
-                      <div className="book-authors">{book.authors}</div>
-                      <div className="book-published-date">Published: {book.publishedDate}</div>
+            {this.state.booklist.map((book) => (
+              <li key={book.id}>
+                <div className="book">
+                  <div className="book-top">
+                    {book.imageLinks ? (
+                      <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                    ) : (<div className="book-cover">No Image</div>
+                    )}
+                    <div className="book-shelf-changer">
+                      <select value={this.state.shelf} onChange={(e) => this.handleSubmit(book, e)}>
+                        <option value="none" disabled>Move to...</option>
+                        <option value="currentlyReading">Currently Reading</option>
+                        <option value="wantToRead">Want to Read</option>
+                        <option value="read">Read</option>
+                        <option value="none">None</option>
+                      </select>
                     </div>
-                  </li>
-                ))}
+                  </div>
+                  <div className="book-title">{book.title}</div>
+                  <div className="book-sub-title">{book.subtitle}</div>
+                  <div className="book-authors">{book.authors}</div>
+                  <div className="book-published-date">Published: {book.publishedDate}</div>
+                </div>
+              </li>
+            ))}
           </ol>
-          )}
-          {this.state.query === '' && (
-            <div>No Results</div>
           )}
         </div>
       </div>
