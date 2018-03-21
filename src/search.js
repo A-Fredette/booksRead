@@ -5,9 +5,10 @@ import * as BooksAPI from './BooksAPI'
 class Search extends Component {
 
   state = {
-    shelf: 'none',
+    shelf: 'None',
     query: '',
-    booklist: []
+    booklist: [],
+    bookCheck: []
   }
 
 
@@ -17,15 +18,33 @@ class Search extends Component {
     this.props.updateShelf(targetBook, targetShelf)
   }
 
+  checkShelves = (result, currentShelves) => {
+    for (let each in result) {
+      let currentID = result[each].id
+
+      for (let book in currentShelves) {
+        let idCheck = currentShelves[book].id
+
+        if (currentID === idCheck) {
+          console.log('match with', currentID, 'and', idCheck)
+          result[each].shelf = currentShelves[book].shelf
+          console.log(result[each].shelf, currentShelves[book].shelf)
+        }
+      }
+    }
+  }
+
   updateQuery = (query) => {
     this.setState({query: query})
       BooksAPI.search(query).then((searchResults) => {
-        console.log("query ", query)
-        console.log("search results ", searchResults)
 
         if (searchResults.error) {
           this.setState({booklist: []})
         } else {
+          for (let each in searchResults) {
+            searchResults[each].shelf = "none"
+          }
+          this.checkShelves(searchResults, this.props.booklist)
           this.setState({booklist: searchResults})
         }
 
@@ -64,13 +83,13 @@ class Search extends Component {
                     ) : (<div className="book-cover">No Image</div>
                     )}
                     <div className="book-shelf-changer">
-                      <select value={this.state.shelf} onChange={(e) => this.handleSubmit(book, e)}>
-                        <option value="none" disabled>Move to...</option>
-                        <option value="currentlyReading">Currently Reading</option>
-                        <option value="wantToRead">Want to Read</option>
-                        <option value="read">Read</option>
-                        <option value="none">None</option>
-                      </select>
+                        <select value={book.shelf} onChange={(e) => this.handleSubmit(book, e)}>
+                          <option value="undefined" disabled>Move to...</option>
+                          <option value="currentlyReading">Currently Reading</option>
+                          <option value="wantToRead">Want to Read</option>
+                          <option value="read">Read</option>
+                          <option value="none">None</option>
+                        </select>
                     </div>
                   </div>
                   <div className="book-title">{book.title}</div>

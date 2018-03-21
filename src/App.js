@@ -29,7 +29,8 @@ class BooksApp extends React.Component {
   updateShelf = (book, newShelf) => {
     let updatedObject = this.state.booklist.filter(newState => newState.id === book)
     .map(book => ({ id: book.id, shelf: newShelf, title: book.title, author: book.author, url: book.url }))
-    let findIndex  = this.state.booklist.findIndex(thisBook => thisBook.id === book)
+
+    let findIndex = this.state.booklist.findIndex(thisBook => thisBook.id === book)
 
     let keepDigging = this.state.booklist.slice()
 
@@ -40,6 +41,7 @@ class BooksApp extends React.Component {
     change(keepDigging, updatedObject)
 
     BooksAPI.update(book, newShelf).then((updatedList) => {
+      console.log(updatedList)
       this.setState(state => ({
         booklist: state.booklist.concat([updatedList])
       }))
@@ -54,7 +56,7 @@ class BooksApp extends React.Component {
     return (
       <div className="app">
        <Route path="/search" render={() => (
-        <Search updateShelf={this.updateShelf}/>
+        <Search updateShelf={this.updateShelf} booklist={this.state.booklist}/>
       )
     }/>
      <Route exact path="/" render={() => (
