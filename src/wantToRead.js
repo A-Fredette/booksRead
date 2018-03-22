@@ -24,7 +24,10 @@ class WantToRead extends Component {
               <li key={book.id}>
                 <div className="book">
                   <div className="book-top">
-                    <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                    {book.imageLinks ? (
+                      <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                    ) : (<div className="book-cover">No Image</div>
+                    )}
                     <div className="book-shelf-changer">
                       <select value={this.state.shelf} onChange={(e) => this.handleSubmit(book, e)}>
                         <option value="none" disabled>Move to...</option>
